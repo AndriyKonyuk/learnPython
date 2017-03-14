@@ -17,3 +17,10 @@ numbers = '1 4 10 20 1 11 12'
 a = '1 4 1 12'
 b = '1 12 10 20'
 print(like(numbers, a, b))
+
+
+def fine_print(n: int):
+    for i in range(n):
+        print('%-10d %-10o %-10x %-10s' % (i,i,i,bin(i)))
+
+fine_print(20)
