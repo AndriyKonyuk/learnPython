@@ -20,7 +20,25 @@ print(like(numbers, a, b))
 
 
 def fine_print(n: int):
-    for i in range(n):
+    for i in range(n+1):
         print('%-10d %-10o %-10x %-10s' % (i,i,i,bin(i)))
 
-fine_print(20)
+fine_print(1000)
+
+def decorator(fun:object):
+    def wrapper(x, y, **kwargs):
+        try:
+            return fun(x,y, **kwargs)
+        except Exception as err:
+            print('Exception occurred in func:', fun.__name__, err)
+            print('Input args:', x, y)
+            print('Input kwargs:', kwargs)
+            return None
+    return wrapper
+
+
+@decorator
+def func(x, y, **kwargs):
+    return x / y
+
+print(func(10,0,op='division',base=20))
