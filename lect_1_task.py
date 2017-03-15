@@ -1,3 +1,5 @@
+import string
+
 def like(numbers: str, a_set: str, b_set: str):
     likes = 0
     numbers, a_set, b_set = numbers.split(' '), a_set.split(' '), b_set.split(' ')
@@ -42,3 +44,17 @@ def func(x, y, **kwargs):
     return x / y
 
 print(func(10,0,op='division',base=20))
+
+def filter_func(list_email: list):
+    def fil_fun(email):
+        if '@' in email and len(email.split('@')) == 2 and len(email.split('@')[0]) > 1 and email[
+            0] in string.ascii_letters or '_' in email[0] and len(email.split('@')[1].split('.')) > 1:
+            for i in email.split('@')[0]:
+                if (i not in string.ascii_letters) and (i not in string.digits) and (i not in '_'):
+                    return None
+            return email
+
+    return list(filter(fil_fun, list_email))
+
+emails = ['abc@gmail.com.ua', '*@ank.com', '_ny@us.gov.us', 'z@b.kk']
+print(filter_func(emails))
