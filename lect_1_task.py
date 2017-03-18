@@ -10,7 +10,6 @@ def like(numbers: str, a_set: str, b_set: str):
             likes -= 1
     return likes
 
-
 numbers = '3 2 10 7 5 5 2 1 2'
 a = '2 3 7'
 b = '5 10 7'
@@ -21,14 +20,11 @@ a = '1 4 1 12'
 b = '1 12 10 20'
 print(like(numbers, a, b))
 
-
 def fine_print(n: int):
     for i in range(n + 1):
         print('%-10d %-10o %-10x %-10s' % (i, i, i, bin(i)[2:]))
 
-
 fine_print(10)
-
 
 def decorator(f):
     def wrapper(*args, **kwargs):
@@ -42,14 +38,11 @@ def decorator(f):
 
     return wrapper
 
-
 @decorator
 def func(x, y, *args, **kwargs):
     return x / y
 
-
 print(func(10, 7, 2, 4, 78, 85, 96, op='division', base=10, ui='lsejk'))
-
 
 def filter_func(list_email: list):
     def fil_fun(email):
@@ -64,7 +57,6 @@ def filter_func(list_email: list):
             return email
 
     return list(filter(fil_fun, list_email))
-
 
 emails = ['abc@gmail.com.ua', '*@ank.com', '_ny@us.gov.us', 'z@b.kk', 'a@co.com', 'abc@c.c']
 print(filter_func(emails))

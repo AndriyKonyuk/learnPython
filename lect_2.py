@@ -1,5 +1,6 @@
 l = [1, 2, [3, 4, [5, 6, [8, 9]]]]
 
+
 class One:
     def met(self, l: list):
         for i in l:
@@ -12,6 +13,7 @@ class One:
 class Two:
     def __init__(self):
         self.nl = []
+
     def met(self, l: list):
         for i in l:
             if isinstance(i, int):
@@ -23,5 +25,7 @@ class Two:
 
 t = One()
 d = Two()
-
 print(t.met(l))
+# метод glob from partlib import Path
+# os.environ, os.access проверка flags, os.system
+# class.__mro__
