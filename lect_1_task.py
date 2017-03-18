@@ -1,6 +1,5 @@
 import string
 
-
 def like(numbers: str, a_set: str, b_set: str):
     likes = 0
     numbers, a_set, b_set = numbers.split(' '), a_set.split(' '), b_set.split(' ')
@@ -34,20 +33,22 @@ fine_print(10)
 def decorator(f):
     def wrapper(*args, **kwargs):
         try:
-            return f(args[0], args[1])
+            return f(*args, **kwargs)
         except Exception as err:
             print('Exception occurred in func:', f.__name__, err)
-            print('Input args:', args)
-            print('Input kwargs:', kwargs)
+            print('Input args:', str(args)[1:-1])
+            print('Input kwargs:', str(kwargs)[1:-1])
             return None
+
     return wrapper
 
+
 @decorator
-def func(x, y):
+def func(x, y, *args, **kwargs):
     return x / y
 
 
-print(func(10, 2, 7,8,9, op='division', base=10))
+print(func(10, 7, 2, 4, 78, 85, 96, op='division', base=10, ui='lsejk'))
 
 
 def filter_func(list_email: list):
