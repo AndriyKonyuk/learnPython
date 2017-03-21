@@ -9,8 +9,8 @@ def do_things(self):
 class PublicMeta(type):
     def __new__(meta, name, bases, attrs):
         for key, value in attrs.items():
-            if not callable(value) and key[:4] == '_' + name + '__' and key[-2:] != '__':
-                attrs[key[4:]] = value
+            if not callable(value) and key[:len(name)+3] == '_' + name + '__' and key[-2:] != '__':
+                attrs[key[len(name)+3:]] = value
                 attrs.pop(key)
         attrs['pretty_func'] = pretty_func
         attrs['do_things'] = do_things
