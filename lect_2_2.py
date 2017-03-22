@@ -1,5 +1,11 @@
 class A(type):
-    pass
+    def treePrint(self):
+        l = []
+        for i in self.__bases__:
+            if not i in l:
+                l.append(i)
+                i.treePrint()
+        return l
 
 class B(A):
     pass
@@ -22,4 +28,12 @@ class G(C):
 class H(F,E,G):
     pass
 
-print(H.__mro__)
+l = []
+def treeprint(cls):
+    for i in cls.__bases__:
+        if i not in l:
+            l.append(i)
+            treeprint(i)
+    return l
+
+print(treeprint(H))
