@@ -1,10 +1,8 @@
 def pretty_func():
     print('Some useful message')
 
-
 def do_things(self):
     print(self.var)
-
 
 class PublicMeta(type):
     def __new__(meta, name, bases, attrs):
@@ -15,7 +13,6 @@ class PublicMeta(type):
         attrs['pretty_func'] = pretty_func
         attrs['do_things'] = do_things
         return type.__new__(meta, name, bases, attrs)
-
 
 class A(metaclass=PublicMeta):
     __var = 10
