@@ -24,7 +24,7 @@ class AOpen:
 
     def read(self):
         os.lseek(self.open_file, 0, os.SEEK_SET)
-        return os.read(self.open_file, os.stat(self.open_file).st_size).decode('utf-8')
+        return os.read(self.open_file, os.stat(self.open_file).st_size).decode(self.encoding)
 
     def readLine(self, line_number: int):
         os.lseek(self.open_file, 0, os.SEEK_SET)
