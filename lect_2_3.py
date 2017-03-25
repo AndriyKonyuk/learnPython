@@ -20,7 +20,7 @@ class AOpen:
         return os.fdopen(self.open_file, self.modep)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        return isinstance(exc_val, TypeError)
+        os.close(self.open_file)
 
     def read(self):
         os.lseek(self.open_file, 0, os.SEEK_SET)
@@ -28,7 +28,10 @@ class AOpen:
 
     def readLine(self, line_number: int):
         os.lseek(self.open_file, 0, os.SEEK_SET)
-        return self.read().split('\n')[line_number]
+        if line_number < len(self.read().split('\n')):
+            return self.read().split('\n')[line_number]
+        else:
+            return 'Enter correct line index'
 
     def write(self, s: str):
         if self.mode == os.O_WRONLY | os.O_CREAT:
@@ -45,7 +48,8 @@ class AOpen:
             os.ftruncate(self.open_file, 0)
             os.lseek(self.open_file, 0, os.SEEK_SET)
             os.write(self.open_file, '\n'.encode() + s.encode())
-
+        elif self.mode == os.O_APPEND | os.O_CREAT:
+            os.write(self.open_file, s.encode())
         else:
             os.lseek(self.open_file, os.stat(self.open_file).st_size, os.SEEK_SET)
             os.write(self.open_file, '\n'.encode() + s.encode())
@@ -55,7 +59,5 @@ class AOpen:
 
 
 filepath = 'file.txt'
-z = AOpen(filepath, 'r')
-with AOpen(filepath, 'r') as a:
-    print(a.read())
-
+z = AOpen(filepath, 'a')
+print(z.writeLine('ак'))
