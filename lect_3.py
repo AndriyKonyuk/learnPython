@@ -7,7 +7,7 @@ class FILO:
         return self.l
 
     def push(self):
-        self.l.remove(self.l[0])
+        self.l.remove(self.l[-1])
         if len(self.l) == 0:
             raise StopIteration
 
@@ -23,14 +23,14 @@ class FIFO:
         return self.l
 
     def push(self):
-        self.l.remove(self.l[-1])
+        self.l.remove(self.l[0])
         if len(self.l) == 0:
             raise StopIteration
 
     def __str__(self):
         return str(self.l)
 
-y = FIFO()
+y = FILO()
 y.pull(5)
 y.pull(7)
 y.pull(6)
