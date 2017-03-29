@@ -39,3 +39,4 @@ def html_printer(s: str) -> str:
 if __name__ == '__main__':
     print(html_printer('I\'ll give  you +++ cash for this -> struff.'))
     print('&lt;p&gt;&lt;b&gt;I&#x27;ll give you +++ cash for this -&gt; struff.&lt;b&gt;&lt;p&gt;')
+
