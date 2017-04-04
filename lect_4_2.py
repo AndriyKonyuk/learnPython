@@ -1,6 +1,8 @@
 import requests, threading, time, random
 from lxml import html
 import logging
+from concurrent.futures import ThreadPoolExecutor
+# module futures..... method threading.pool(submit return future.resault)
 
 
 class Scraper:
@@ -29,27 +31,37 @@ class Scraper:
 
     def start(self):
         self.__prepare()
+        global thread
         thread = []
-        for i in range(self.page_from, self.page_to):
-            t = threading.Thread(target=self.crawl, args=(self.get_link(i),))
-            thread.append(t)
-            self.notify(self.get_link(i))
-            # self.semaphore.acquire()
-            # self.semaphore.release()
-            time.sleep(2)
-            t.start()
+        # for i in range(self.page_from, self.page_to):
+        #     t = threading.Thread(target=self.crawl, args=(self.get_link(i),))
+        #     thread.append(t)
+        #     self.notify(self.get_link(i))
+        #
+        # for t in thread:
+        #     t.start()
+        #
+        #
+        # for t in thread:
+        #     t.join()
+        with ThreadPoolExecutor() as executor:
+            for i in range(self.page_from, self.page_to):
+                self.notify(self.get_link(i))
+                t = executor.submit(self.crawl, self.get_link(i))
+                thread += t.result()
+                self.semaphore.release()
+        return thread
 
     def notify(self, url_crawl):
         logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:', )
         logging.debug('Task done: {0}'.format(url_crawl))
-        # Виводить повідомлення такого вигляду
-        # Task done: page_url
 
     def get_link(self, page):
         link = 'https://www.olx.ua/chernovtsy/q-{0}/?page={1}'.format(self.query, page)
         return link
 
     def crawl(self, url):
+        self.semaphore.acquire()
         resp = self.session.get(url)
         if resp.status_code == 200:
             page = resp.text
@@ -58,17 +70,18 @@ class Scraper:
             offers = root.xpath('//td[@class="offer "]')
             for offer in offers:
                 try:
-                    title = offer.xpath('.//div[@class="spacerel"]/h3/a/strong/text()')[0]
-                    price = offer.xpath('.//td[@class="wwnormaltrighttd - price"]//p/strong/text()')[0]
+                    title = offer.xpath('.//div[@class="space rel"]/h3/a/strong/text()')[0]
+                    price = offer.xpath('.//td[@class="wwnormal tright td-price"]//p/strong/text()')[0]
                     items.append((title, price))
                 except:
                     pass
             return items
 
 
-scrapper = Scraper('iphone', 1, 4, limit=2)
+scrapper = Scraper('iphone', 1, 2, limit=2)
+# results = scrapper.crawl('https://www.olx.ua/chernovtsy/q-apple/?page=1')
 results = scrapper.start()
 
-# for result in results:
-    # offer, price = result
-    # print(offer, price)
+for result in results:
+    offer, price = result
+    print(offer, price)
