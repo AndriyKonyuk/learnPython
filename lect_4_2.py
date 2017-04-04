@@ -79,7 +79,6 @@ class Scraper:
 
 
 scrapper = Scraper('iphone', 1, 2, limit=2)
-# results = scrapper.crawl('https://www.olx.ua/chernovtsy/q-apple/?page=1')
 results = scrapper.start()
 
 for result in results:
