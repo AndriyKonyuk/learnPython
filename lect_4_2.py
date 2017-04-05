@@ -31,7 +31,6 @@ class Scraper:
 
     def start(self):
         self.__prepare()
-        global thread
         thread = []
         # for i in range(self.page_from, self.page_to):
         #     t = threading.Thread(target=self.crawl, args=(self.get_link(i),))
@@ -41,14 +40,13 @@ class Scraper:
         # for t in thread:
         #     t.start()
         #
-        #
         # for t in thread:
         #     t.join()
         with ThreadPoolExecutor() as executor:
             for i in range(self.page_from, self.page_to):
                 self.notify(self.get_link(i))
-                t = executor.submit(self.crawl, self.get_link(i))
-                thread += t.result()
+                t = executor.submit(self.crawl, self.get_link(i)) # створюємо окремий потік для url
+                thread += t.result()  # t.result() повертає список, тому додаєм до нового
                 self.semaphore.release()
         return thread
 
