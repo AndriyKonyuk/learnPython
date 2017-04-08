@@ -1,8 +1,9 @@
-import requests, threading, time, random
+import requests, threading
 from lxml import html
 import logging
 from concurrent.futures import ThreadPoolExecutor
-# module futures..... method threading.pool(submit return future.resault)
+
+
 
 
 class Scraper:
@@ -28,10 +29,11 @@ class Scraper:
         }
         self.session = requests.Session()
         self.session.headers.update(HEADERS)
+        self.log = logging.basicConfig(level=logging.INFO)
 
     def start(self):
         self.__prepare()
-        thread = []
+        res = []
         # for i in range(self.page_from, self.page_to):
         #     t = threading.Thread(target=self.crawl, args=(self.get_link(i),))
         #     thread.append(t)
@@ -42,24 +44,22 @@ class Scraper:
         #
         # for t in thread:
         #     t.join()
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(2) as executor:
             for i in range(self.page_from, self.page_to):
-                self.notify(self.get_link(i))
                 t = executor.submit(self.crawl, self.get_link(i)) # створюємо окремий потік для url
-                thread += t.result()  # t.result() повертає список, тому додаєм до нового
-                self.semaphore.release()
-        return thread
+                link = self.get_link(i)
+                t.add_done_callback(self.notify(link))
+                res += t.result()  # t.result() повертає список, тому додаєм до нового
+        return res
 
     def notify(self, url_crawl):
-        logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:', )
-        logging.debug('Task done: {0}'.format(url_crawl))
+        logging.info('Task done: {0}'.format(url_crawl))
 
     def get_link(self, page):
         link = 'https://www.olx.ua/chernovtsy/q-{0}/?page={1}'.format(self.query, page)
         return link
 
     def crawl(self, url):
-        self.semaphore.acquire()
         resp = self.session.get(url)
         if resp.status_code == 200:
             page = resp.text
@@ -76,7 +76,7 @@ class Scraper:
             return items
 
 
-scrapper = Scraper('iphone', 1, 2, limit=2)
+scrapper = Scraper('iphone', 1, 4, limit=2)
 results = scrapper.start()
 
 for result in results:
