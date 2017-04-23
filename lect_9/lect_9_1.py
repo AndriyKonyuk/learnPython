@@ -9,31 +9,18 @@ from lxml import html
 # ‘price’: ‘100’,
 # ‘currency’: ‘usd’
 # }
-event_loop = asyncio.get_event_loop()
 
-conn = psycopg2.connect("host='localhost' dbname='postgres' user='postgres' password='postgres'")
-conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-cur = conn.cursor()
-try:
-    cur.execute("CREATE DATABASE test")
-except:
-    print("Database already exist")
-cur.close()
-conn.close()
-
-conn = psycopg2.connect("host='localhost' dbname='test' user='admin' password='admin'")
-conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-cur = conn.cursor()
-try:
-    cur.execute("CREATE TABLE overclockers (id serial PRIMARY KEY, title CHAR(255),url CHAR(255), author CHAR(255),"
-            "text text, price CHAR(20), currency CHAR(10) )")
-except:
-    print("Data table already exist")
+async def get_page(url):
+    async with session.get(url) as response:
+        if response.status == 200:
+            page = await response.text()
+            return page
 
 
 def close_db(cur, conn):
     conn.commit()
     cur.close()
+    session.close()
     conn.close()
 
 
@@ -42,16 +29,16 @@ def parse_page(first_page: int, last_page: int):
     list_of_advert = []
     for i in range((first_page - 1) * 40, last_page * 40, 40):  # формуємо список сторінок, кожна сторінка +40
         list_urls.append('http://forum.overclockers.ua/viewforum.php?f=26&start={0}'.format(i))
-    # print(list_urls)
 
     async def parse(page):
-        root = html.parse(page)
-        text_topic = root.xpath('//ul[@class="topiclist topics"]/li/dl/dt/div/a')  # title, url
+        content = await get_page(page)
+        root = html.fromstring(content)
+        text_topic = root.xpath('//ul[@class="topiclist topics"]/li/dl')  # title, url
         for i in text_topic:  # title
             topic = {}
-            topic["title"] = i.text
-            topic["url"] = 'http://forum.overclockers.ua/' + i.attrib['href']
-            topic["author"] = i.xpath('./../../../dd/a')[0].text
+            topic["title"] = i.xpath('./dt/div/a/text()')[0]
+            topic["url"] = 'http://forum.overclockers.ua' + i.xpath('./dt/div/a/@href')[0][1:]
+            topic["author"] = i.xpath('./dd/a')[0].text
             list_of_advert.append(topic)
         return list_of_advert
 
@@ -73,7 +60,8 @@ def parse_topic_content(list_of_page_parse: list):
 
     async def parse_topick(list_of_page):
         for dict_page in list_of_page:
-            croot = html.parse(dict_page["url"])
+            page = await get_page(dict_page["url"])
+            croot = html.fromstring(page)
             text_topic_cont = croot.xpath('//*/div[@class="content"]')[0].xpath('descendant-or-self::text()')
 
             s = ''
@@ -109,9 +97,27 @@ def parse_topic_content(list_of_page_parse: list):
     finally:
         event_loop.close()
 
-value = parse_topic_content(parse_page(1,1))
-for i in value:
-    cur.execute("INSERT INTO overclockers (title, url, author, text, price, currency) VALUES ( %s, %s, %s, %s, %s, %s)", (i['title'], i['url'], i['author'], i['text'], i['price'], i['currency']))
-    # print(i['title'], i['url'], i['author'], i['text'], i['price'], i['currency'])
-#
-close_db(cur, conn)
+if __name__ == '__main__':
+    event_loop = asyncio.get_event_loop()
+    session = aiohttp.ClientSession(loop=event_loop)
+
+
+    conn = psycopg2.connect("host='localhost' dbname='postgres' user='postgres' password='postgres'")
+    conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+    cur = conn.cursor()
+
+    try:
+        cur.execute("CREATE TABLE IF NOT EXISTS overclockers (id serial PRIMARY KEY, title CHAR(255), url CHAR(255) UNIQUE, author CHAR(255),"
+                    "text text, price CHAR(20), currency CHAR(10) )")
+    except:
+        print("Data table already exist")
+
+    value = parse_topic_content(parse_page(1,1))
+    for i in value:
+        link = i['url'].split('&sid')[0]
+        print(link)
+        cur.execute("INSERT INTO overclockers (title, url, author, text, price, currency) "
+                    "VALUES ( %s, %s, %s, %s, %s, %s) ON CONFLICT (url) DO NOTHING;",
+                    (i['title'], link, i['author'], i['text'], i['price'], i['currency']))
+
+    close_db(cur, conn)
