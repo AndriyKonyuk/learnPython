@@ -13,6 +13,7 @@ class MainWindowSlots(Ui_Form):
     # Определяем пользовательский слот
     def writeToTable(self):
         self.conn_to_db()
+        self.tableWidget.setRowCount(self.count)
         for val, i in zip(self.data, range(self.count)):
             self.tableWidget.setItem(i, 0, QTableWidgetItem(str(val['_id'])))
             self.tableWidget.setItem(i, 1, QTableWidgetItem(val['author']))
@@ -21,9 +22,6 @@ class MainWindowSlots(Ui_Form):
             self.tableWidget.setItem(i, 4, QTableWidgetItem(val['text']))
             self.tableWidget.setItem(i, 5, QTableWidgetItem(val['price']))
             self.tableWidget.setItem(i, 6, QTableWidgetItem(val['currency']))
-
-        widget = super().tableWidget
-        widget.setItem(widget.setRowCount(self.count))
         return None
 
     def conn_to_db(self):

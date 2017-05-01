@@ -22,7 +22,7 @@ class Ui_Form(object):
         self.tableWidget.setGeometry(QtCore.QRect(120, 60, 571, 341))
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(7)
-        self.tableWidget.setRowCount(60)
+        self.tableWidget.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
