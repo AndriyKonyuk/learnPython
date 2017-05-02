@@ -9,6 +9,7 @@ coll = conn_db['setdata']
 count = coll.count()
 data = coll.find()
 
+
 class MainWindowSlots(Ui_Form):
     def writeToTable(self):
         self.tableWidget.setRowCount(count)
@@ -23,8 +24,9 @@ class MainWindowSlots(Ui_Form):
         return None
 
     def save_file(self):
+        info = coll.find({}, {"_id": 0, "author": 1, "title": 1, "url": 1, "text": 1, "currency": 1, "price": 1})
         filename = QFileDialog.getSaveFileName()
         file = open(filename[0], 'a')
-        for i in data:
+        for i in info:
             json.dump(str(i), file)
         file.close()
