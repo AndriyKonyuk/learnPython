@@ -33,7 +33,7 @@ with xlsxwriter.Workbook("coin_market_cap.xlsx") as workbook:
     money_format = workbook.add_format({'num_format': '$ ###,###,###,###'})
     money_float_format = workbook.add_format({'num_format': '$ ###,###,###,###.######'})
     money_without_dollar_format = workbook.add_format({'num_format': '###,###,###,###.###'})
-    percent_format = workbook.add_format({'num_format': '###,### %'})
+    # percent_format = workbook.add_format({'num_format': '0.#%'})
     worksheet = workbook.add_worksheet()
 
     worksheet.add_table('A0:J823')
@@ -57,7 +57,7 @@ with xlsxwriter.Workbook("coin_market_cap.xlsx") as workbook:
         worksheet.write(row, col + 4, float(val[4][1:]), money_float_format)
         worksheet.write(row, col + 5, float(val[5].replace(',','')), money_without_dollar_format)
         worksheet.write(row, col + 6, int(val[6][1:].replace(',', '')), money_format)
-        worksheet.write_number(row, col + 7, float(val[7][:-1]), percent_format)
-        worksheet.write_number(row, col + 8, float(val[8][:-1]), percent_format)
-        worksheet.write(row, col + 9, float(val[9][:-1]), percent_format)
+        worksheet.write_number(row, col + 7, float(val[7][:-1]))
+        worksheet.write_number(row, col + 8, float(val[8][:-1]))
+        worksheet.write(row, col + 9, float(val[9][:-1]))
         row += 1
